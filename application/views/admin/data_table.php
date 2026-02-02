@@ -137,6 +137,10 @@ table#attendanceTable tbody tr {
     line-height: 1.5;
     min-width: 80px;  /* Ensures consistent button widths */
 }
+#attendanceTable_filter input {
+    margin-left: auto;
+    margin-right: 10px;
+}
 .sidebar-footer {
         position: absolute;
         bottom: 20px;
@@ -153,7 +157,8 @@ table#attendanceTable tbody tr {
     <div class="wrapper">
       <nav class="sidebar bg-light">
         <div class="user-info mb-4">
-          <div class="fw-bold">Hello, <?= htmlspecialchars($this->session->userdata('username') ?? 'User') ?></div>
+          <div class="fw-bold">HELLO,</div>
+          <div class="fw-bold"><?= htmlspecialchars($this->session->userdata('full_name') ?? $this->session->userdata('username') ?? 'User') ?></div>
         </div>
         
         <!--
@@ -180,8 +185,9 @@ table#attendanceTable tbody tr {
         </div>
     </div>
 
-          <div class="mb-3 text-end">
-            <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success">Create Report</a>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
+            <div id="attendanceTable_filter" style="flex: 1;"></div>
+            <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success">CREATE A REPORT</a>
           </div>
           <table id="attendanceTable" class="table table-striped table-bordered">
 <!-- In your View (data_table.php) -->
@@ -237,7 +243,7 @@ table#attendanceTable tbody tr {
       </div>
     </div>
     <div class="sidebar-footer">
-          <a href="<?= base_url('Main/signout') ?>" class="btn btn-outline-danger btn-sm">Sign out</a>
+          <a href="<?= base_url('Main/signout') ?>" class="btn btn-outline-danger btn-sm">SIGN OUT</a>
         </div>
     <script>
         $(document).ready(function () {
@@ -245,6 +251,10 @@ table#attendanceTable tbody tr {
           responsive: true,
           pageLength: 10,
           lengthMenu: [5, 10, 25, 50],
+          language: {
+            lengthMenu: "SHOW _MENU_ ENTRIES PER PAGE",
+            search: "SEARCH:"
+          },
           columnDefs: [
             { targets: 0, width: "40%" },
             { targets: 1, width: "30%" },

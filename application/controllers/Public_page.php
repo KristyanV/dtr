@@ -238,7 +238,7 @@ $this->load->view('admin/View_attendance2', $data);
             ];
 
     } 
-}
+}   
 
 //Update Attendance Report
     public function data_update($id) {

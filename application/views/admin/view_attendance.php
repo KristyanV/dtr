@@ -22,7 +22,7 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: 20px;
+  padding: 10px;
   width: 100%;
   max-width: 1440px;
   margin: 0 auto;
@@ -34,6 +34,7 @@ body {
   width: 100%;
   max-width: 850px;
   margin: 0 auto;
+  page-break-inside: avoid;
 }
 
 /* ✅ Responsive Container */
@@ -110,11 +111,70 @@ body {
   }
 }
 
+/* Print Styles */
+@media print {
+  * {
+    margin: 0;
+    padding: 0;
+  }
+  
+  body {
+    padding: 0;
+    margin: 0;
+  }
+  
+  .container-wrapper {
+    page-break-inside: avoid;
+  }
+  
+  .attendance-container {
+    page-break-inside: avoid;
+  }
+  
+  .report-container {
+    page-break-inside: avoid;
+  }
+  
+  .report-header {
+    page-break-inside: avoid;
+  }
+  
+  .report-info {
+    page-break-inside: avoid;
+  }
+  
+  .attendance-section,
+  .uniform-section {
+    page-break-inside: avoid;
+  }
+  
+  .attendance-table,
+  .uniform-table {
+    page-break-inside: avoid;
+  }
+  
+  .signature-section {
+    page-break-inside: avoid;
+  }
+  
+  .footer {
+    page-break-inside: avoid;
+  }
+  
+  .back-to-home {
+    display: block;
+    margin: 30px auto 0 auto;
+    text-align: center;
+    width: fit-content;
+  }
+}
+
 /* Report Container */
 .report-container {
   width: 100%;
-  padding: 20px 0;
-  margin: 20px 0;
+  padding: 10px 0;
+  margin: 10px 0;
+  page-break-inside: avoid;
 }
 
 /* ✅ Report Header fits within body */
@@ -128,8 +188,9 @@ body {
   flex-wrap: wrap;
   width: 100%;
   max-width: 100%;
-  font-size: 20px;
+  font-size: 16px;
   margin-bottom: 10px;
+  page-break-inside: avoid;
 }
 .report-header p{
   margin-bottom: 0px;
@@ -159,8 +220,9 @@ body {
   gap: 30px; /* space between each label-p group */
   flex-wrap: wrap;
   width: 100%;
-  font-size: 20px; 
-  margin-bottom: 30px; 
+  font-size: 14px; 
+  margin-bottom: 15px;
+  page-break-inside: avoid;
 }
 
 .info-item {
@@ -178,9 +240,17 @@ body {
 /* Attendance and Uniform Tables */
 .attendance-section h2,
 .uniform-section h2 {
-  font-size: 12pt;
+  font-size: 11pt;
   font-weight: bold;
   margin-bottom: 0;
+  margin-top: 10px;
+  page-break-inside: avoid;
+}
+
+.attendance-section,
+.uniform-section {
+  page-break-inside: avoid;
+  width: 100%;
 }
 
 .attendance-table,
@@ -189,6 +259,7 @@ body {
   max-width: 100%;
   margin: 0 auto;
   border-collapse: collapse;
+  page-break-inside: avoid;
 }
 
 .attendance-table th,
@@ -213,11 +284,12 @@ body {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin-top: 40px; 
-  padding: 0 20px;
+  margin-top: 20px; 
+  padding: 0 10px;
+  page-break-inside: avoid;
 }
 
-.submitted-by {
+.submitted-by { 
   flex: 1;
   text-align: left;
 }
@@ -250,9 +322,10 @@ body {
 .footer {
   display: flex;
   justify-content: flex-end; /* push content to the right */
-  padding: 0 20px;
-  margin-top: 20px;
+  padding: 0 10px;
+  margin-top: 10px;
   width: 100%;
+  page-break-inside: avoid;
 }
 
 .footer-info {
@@ -362,7 +435,7 @@ body {
 <tbody>
   <?php if (!empty($report['not_in_uniform'])): ?>
     <?php $uniforms = json_decode($report['not_in_uniform'], true); ?>
-    <?php foreach ($uniforms as $uniform): ?>
+    <?php foreach ($uniforms as $uniform): ?> 
       <tr>
         <td><?= htmlspecialchars($uniform['name'] ?? 'N/A' ) ?></td>
         <td><?= htmlspecialchars($uniform['remarks'] ?? 'N/A' ) ?></td>
@@ -402,7 +475,7 @@ body {
     <p class="footer-text">Page 1 of 1</p>
   </div>
 </div>
-  <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary back-to-home">Back to Home</a>
+  <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary back-to-home">BACK TO HOME</a>
   </div>
  </form>
 

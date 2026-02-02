@@ -370,11 +370,11 @@ margin-top: 30px;
   </select>
 </td>
             <td><input type="text" name="absentees[cause][]" placeholder="Cause"></td>
-            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">Delete</button></td>
+            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
           </tr>
         </tbody>
       </table>
-      <button type="button"  onclick="addAbsenteeRow()" class="btn btn-success">Add Row</button>
+      <button type="button"  onclick="addAbsenteeRow()" class="btn btn-success">ADD ROW</button>
     </div>
 
     <!-- Table for Not in Prescribed Uniform -->
@@ -392,11 +392,11 @@ margin-top: 30px;
           <tr>
             <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
-            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">Delete</button></td>
+            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
           </tr>
         </tbody>
       </table>
-      <button type="button"  onclick="addUniformRow()" class="btn btn-success">Add Row</button>
+      <button type="button"  onclick="addUniformRow()" class="btn btn-success">ADD ROW</button>
     </div>
   </div>
 
@@ -428,8 +428,8 @@ margin-top: 30px;
 
   <!-- Optional: Form Submit Button -->
   <div class="submit">
-    <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary me-2">Back to Home</a>
-    <button type="submit" class="btn btn-primary">Submit Attendance Report</button>
+    <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary me-2">BACK TO HOME</a>
+    <button type="submit" class="btn btn-primary">SUBMIT ATTENDANCE REPORT</button>
   </div>
 
 </form>
@@ -466,7 +466,7 @@ function addAbsenteeRow() {
   </select>
 </td>
             <td><input type="text" name="absentees[cause][]" placeholder="Cause"></td>
-            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">Delete</button></td>
+            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
         </tr>
     `;
     table.insertAdjacentHTML('beforeend', newRow);
@@ -478,7 +478,7 @@ function addUniformRow() {
         <tr>
             <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
-            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">Delete</button></td>
+            <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
         </tr>
     `;
     table.insertAdjacentHTML('beforeend', newRow);

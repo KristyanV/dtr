@@ -413,8 +413,7 @@ body {
 </div>
 
 <div class="fixed-actions">
-  <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary">Back to Home</a>
-  <a href="<?= base_url('Public_page/data_update/' . $attendance_reports['id']) ?>" class="btn btn-primary">Update Attendance Report</a>
+  <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary">BACK TO HOME</a>
 </div>
 
 <div class="footer">
