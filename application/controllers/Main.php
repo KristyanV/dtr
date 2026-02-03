@@ -54,14 +54,20 @@ class Main extends CI_Controller {
                 'id' => $user->id,
                 'username' => $user->username,
                 'password' => $user->password,
-                'name' => $user->name,
-                'middlename' => $user->middlename,
-                'surname' => $user->surname,
-                'companyposition' => $user->companyposition,
+                'name' => $user->name ?? $user->username,
+                'middlename' => $user->middlename ?? null,
+                'surname' => $user->surname ?? null,
+                'companyposition' => $user->companyposition ?? null,
+                'role' => $user->role ?? 'viewer',
+                'is_admin' => $user->is_admin ?? 0,
                 'logged_in' => true
             ]);
             
-            redirect('main/list'); // Fix: Redirect to dashboard instead of login
+            if (!empty($user->is_admin)) {
+                redirect('main/admin'); // Admin page
+            }
+
+            redirect('main/list'); // Regular users go to reports table
         } else {
             $this->session->set_flashdata('error', 'Invalid username or password');
             $this->load->view('login_form'); // Added missing semicolon
@@ -121,11 +127,51 @@ class Main extends CI_Controller {
 //Data Table Viewed
 public function list()
 {
+    // Allow both admins and regular users to view the table
     $data['attendance_reports'] = $this->Attendance_model->getData();
     $data['total_reports'] = $this->Attendance_model->getTotalReports();
     $data['total_viewed'] = $this->Attendance_model->getTotalViewed(); // From DB
+    $data['is_admin'] = $this->session->userdata('is_admin') ?? 0;
 
     $this->load->view('admin/data_table', $data);
+}
+
+// Admin dashboard
+public function admin()
+{
+    if (!$this->session->userdata('is_admin')) {
+        redirect('Public_page/attendance_form');
+    }
+
+    $data['users'] = $this->Attendance_model->get_all_users();
+    $this->load->view('admin/admin_page', $data);
+}
+
+// Update user role
+public function update_user_role()
+{
+    if (!$this->session->userdata('is_admin')) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        return;
+    }
+
+    $user_id = $this->input->post('user_id');
+    $role = $this->input->post('role');
+
+    // Validate inputs
+    if (empty($user_id) || empty($role)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid input']);
+        return;
+    }
+
+    // Update the role
+    $result = $this->Attendance_model->update_user_role($user_id, $role);
+    
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Role updated successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to update role']);
+    }
 }
 
 

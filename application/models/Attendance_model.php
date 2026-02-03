@@ -3,6 +3,45 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 class Attendance_model extends CI_Model {
 
+    public function __construct() {
+        parent::__construct();
+        $this->ensure_role_column_exists();
+        $this->ensure_noted_columns_exist();
+    }
+
+    // Ensure role column exists in users table
+    public function ensure_role_column_exists() {
+        $field_exists = $this->db->field_exists('role', 'users');
+        
+        if (!$field_exists) {
+            $this->db->query("ALTER TABLE `users` ADD COLUMN `role` ENUM('note taker', 'viewer') DEFAULT 'viewer' AFTER `department`");
+        }
+    }
+
+    // Ensure is_noted and noted_at columns exist in attendance_reports table
+    public function ensure_noted_columns_exist() {
+        $is_noted_exists = $this->db->field_exists('is_noted', 'attendance_reports');
+        $noted_at_exists = $this->db->field_exists('noted_at', 'attendance_reports');
+        $noted_by_name_exists = $this->db->field_exists('noted_by_name', 'attendance_reports');
+        $noted_by_role_exists = $this->db->field_exists('noted_by_role', 'attendance_reports');
+        
+        if (!$is_noted_exists) {
+            $this->db->query("ALTER TABLE `attendance_reports` ADD COLUMN `is_noted` TINYINT(1) DEFAULT 0 COMMENT 'Whether the report has been noted'");
+        }
+        
+        if (!$noted_at_exists) {
+            $this->db->query("ALTER TABLE `attendance_reports` ADD COLUMN `noted_at` TIMESTAMP NULL DEFAULT NULL COMMENT 'When the report was noted'");
+        }
+        
+        if (!$noted_by_name_exists) {
+            $this->db->query("ALTER TABLE `attendance_reports` ADD COLUMN `noted_by_name` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Name of user who noted'");
+        }
+        
+        if (!$noted_by_role_exists) {
+            $this->db->query("ALTER TABLE `attendance_reports` ADD COLUMN `noted_by_role` VARCHAR(255) NULL DEFAULT NULL COMMENT 'Role of user who noted'");
+        }
+    }
+
     public function insert_attendance($data) {
         return $this->db->insert('attendance_reports', $data);
     }
@@ -28,12 +67,32 @@ public function update_record($id, $data) {
 }
 
 
-    // Login - check `users` table only
+    // Login - check `users` table first, then `admin`
         public function get_user($username, $password) {
             $this->db->where('username', $username);
             $this->db->where('password', $password);
             $query = $this->db->get('users');
-            return $query->row();
+            $user = $query->row();
+
+            if ($user) {
+                $user->is_admin = 0;
+                return $user;
+            }
+
+            // Fallback to admin table
+            $this->db->where('username', $username);
+            $this->db->where('password', $password);
+            $admin = $this->db->get('admin')->row();
+
+            if ($admin) {
+                $admin->name = null;
+                $admin->middlename = null;
+                $admin->surname = null;
+                $admin->companyposition = 'Admin';
+                $admin->is_admin = 1;
+            }
+
+            return $admin;
         }
 
         // Create a new user
@@ -68,5 +127,28 @@ public function getTotalViewed() {
     return $this->db->where('viewed >', 0)->count_all_results('attendance_reports');
 }
 
+// Get all users
+public function get_all_users() {
+    $this->db->order_by('created_at', 'DESC');
+    return $this->db->get('users')->result_array();
+}
+
+// Update user role
+public function update_user_role($user_id, $role) {
+    $this->db->where('id', $user_id);
+    $update_result = $this->db->update('users', ['role' => $role]);
+    return $update_result;
+}
+
+// Mark report as noted
+public function mark_as_noted($report_id, $noted_by_name, $noted_by_role) {
+    $this->db->where('id', $report_id);
+    return $this->db->update('attendance_reports', [
+        'is_noted' => 1, 
+        'noted_at' => date('Y-m-d H:i:s'),
+        'noted_by_name' => $noted_by_name,
+        'noted_by_role' => $noted_by_role
+    ]);
+}
 
 }

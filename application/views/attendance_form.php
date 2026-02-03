@@ -402,9 +402,6 @@ margin-top: 30px;
 
   <div class="signature-section">
     <div class="submitted-by">
-      <p class="noted">NOTED:</p>
-      <p class="signature">ARJEN C. DE LOS SANTOS</p>
-      <p class="position">Division OIC</p>
       <div class="submission-note">
         To be submitted to the HRD Division on or before 3:00 P.M.
       </div>

@@ -8,6 +8,8 @@
     <!-- CSS dependencies -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.datatables.net/2.2.2/css/dataTables.bootstrap5.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
     <!-- JS dependencies -->
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
@@ -160,6 +162,9 @@ table#attendanceTable tbody tr {
           <div class="fw-bold">HELLO,</div>
           <div class="fw-bold"><?= htmlspecialchars($this->session->userdata('full_name') ?? $this->session->userdata('username') ?? 'User') ?></div>
         </div>
+        <div class="mb-4">
+          <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success w-90">CREATE A REPORT</a>
+        </div>
         
         <!--
         <ul class="nav flex-column">
@@ -187,7 +192,6 @@ table#attendanceTable tbody tr {
 
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 10px;">
             <div id="attendanceTable_filter" style="flex: 1;"></div>
-            <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success">CREATE A REPORT</a>
           </div>
           <table id="attendanceTable" class="table table-striped table-bordered">
 <!-- In your View (data_table.php) -->
@@ -196,6 +200,7 @@ table#attendanceTable tbody tr {
     <th class="text-center">Division/Section/Unit</th>
     <th class="text-center">Date</th>
     <th class="text-center">Time</th>
+    <th class="text-center">Status</th>
     <th class="text-center">Option</th>
   </tr>
 </thead>
@@ -213,6 +218,18 @@ table#attendanceTable tbody tr {
   <?= $created_at ?>
   <?php if (isset($row['viewed']) && $row['viewed'] == 0): ?>
     <span class="badge bg-danger new-indicator">NEW</span>
+  <?php endif; ?>
+</td>
+
+<td>
+  <?php if (!empty($row['is_noted']) && $row['is_noted'] == 1): ?>
+    <span class="badge bg-success" title="Noted by: <?= htmlspecialchars($row['noted_by_name'] ?? 'N/A') ?> on <?= !empty($row['noted_at']) ? date('m/d/Y h:i A', strtotime($row['noted_at'])) : '' ?>">
+      <i class="bi bi-check-circle-fill"></i> NOTED
+    </span>
+  <?php else: ?>
+    <span class="badge bg-secondary">
+      <i class="bi bi-clock-history"></i> PENDING
+    </span>
   <?php endif; ?>
 </td>
 

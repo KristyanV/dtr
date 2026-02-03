@@ -7,6 +7,8 @@
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <title>Daily Attendance Report</title>
   
   <style>
@@ -450,8 +452,13 @@ body {
   <div class="signature-section">
   <div class="submitted-by">
     <p class="noted">NOTED:</p>
-    <p class="signature">ARJEN C. DE LOS SANTOS</p>
-    <p class="position">Division OIC</p> 
+    <?php if (!empty($report['noted_by_name'])): ?>
+      <p class="signature"><?= htmlspecialchars($report['noted_by_name']) ?></p>
+      <p class="position"><?= htmlspecialchars($report['noted_by_role'] ?? 'Authorized Signatory') ?></p>
+    <?php else: ?>
+      <p class="signature">_______________________</p>
+      <p class="position">Authorized Signatory</p>
+    <?php endif; ?>
    <div class="submission-note">
   To be submitted to the HRD Division on or before 3:00 P.M.
 </div>
@@ -475,11 +482,61 @@ body {
     <p class="footer-text">Page 1 of 1</p>
   </div>
 </div>
-  <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary back-to-home">BACK TO HOME</a>
+
+  <div style="display: flex; justify-content: center; gap: 15px; margin-top: 20px;">
+    <a href="<?= base_url('Main/list') ?>" class="btn btn-secondary">BACK TO HOME</a>
+    <?php if (isset($user_role) && $user_role === 'note taker'): ?>
+      <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#notedConfirmModal">
+        NOTED
+      </button>
+    <?php endif; ?>
+  </div>
+
   </div>
  </form>
 
+  <!-- Noted Confirmation Modal -->
+  <div class="modal fade" id="notedConfirmModal" tabindex="-1" aria-labelledby="notedConfirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title" id="notedConfirmModalLabel">
+            <i class="bi bi-check-circle-fill me-2"></i>Confirm Noted Action
+          </h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body text-center py-4">
+          <div class="mb-3">
+            <i class="bi bi-question-circle text-success" style="font-size: 3rem;"></i>
+          </div>
+          <h6 class="mb-3">Are you sure you want to mark this report as noted?</h6>
+          <p class="text-muted small mb-0">This action will record your name and timestamp.</p>
+        </div>
+        <div class="modal-footer justify-content-center">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="bi bi-x-circle me-1"></i>Cancel
+          </button>
+          <a href="<?= base_url('Public_page/mark_as_noted/' . ($report['id'] ?? '')) ?>" class="btn btn-success">
+            <i class="bi bi-check-circle me-1"></i>Yes, Mark as Noted
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <?php if ($this->session->flashdata('success')): ?>
+  <div class="alert alert-success text-center" style="margin-top: 20px;">
+    <?= $this->session->flashdata('success') ?>
+  </div>
+  <?php endif; ?>
+
+  <?php if ($this->session->flashdata('error')): ?>
+  <div class="alert alert-danger text-center" style="margin-top: 20px;">
+    <?= $this->session->flashdata('error') ?>
+  </div>
+  <?php endif; ?>
   
-  
+  <!-- Bootstrap Bundle with Popper -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
 </body>
 </html>

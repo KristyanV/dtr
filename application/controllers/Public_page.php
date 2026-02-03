@@ -137,6 +137,7 @@ if (!empty($_POST['not_in_uniform']['name'])) {
 //View Attendance Report
     public function view_report($id) {
         $data['report'] = $this->Attendance_model->getDataById($id);
+        $data['user_role'] = $this->session->userdata('role') ?? 'viewer';
         $this->load->view('admin/View_attendance', $data);
     }
 
@@ -191,6 +192,38 @@ public function view_report2($id) {
     $data['attendance_reports'] = $this->Attendance_model->getDataById($id);
 $this->load->view('admin/View_attendance2', $data);
 
+}
+
+// Handle the noted action
+public function mark_as_noted($id) {
+    // Check if user has note taker role
+    $user_role = $this->session->userdata('role');
+    if ($user_role !== 'note taker') {
+        $this->session->set_flashdata('error', 'You do not have permission to perform this action.');
+        redirect('Public_page/view_report/' . $id);
+        return;
+    }
+
+    // Get user information
+    $user_name = $this->session->userdata('name');
+    $user_middlename = $this->session->userdata('middlename');
+    $user_surname = $this->session->userdata('surname');
+    $user_position = $this->session->userdata('companyposition');
+    
+    // Format full name with middle initial
+    $middle_initial = !empty($user_middlename) ? strtoupper(substr($user_middlename, 0, 1)) . '.' : '';
+    $full_name = strtoupper(trim("$user_name $middle_initial $user_surname"));
+
+    // Update the report as noted
+    $result = $this->Attendance_model->mark_as_noted($id, $full_name, $user_position);
+    
+    if ($result) {
+        $this->session->set_flashdata('success', 'Report has been marked as noted.');
+    } else {
+        $this->session->set_flashdata('error', 'Failed to mark report as noted.');
+    }
+    
+    redirect('Public_page/view_report/' . $id);
 }
 
 
