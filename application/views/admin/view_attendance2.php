@@ -36,6 +36,10 @@ body {
   margin: 0 auto;
 }
 
+.view-uppercase {
+  text-transform: uppercase;
+}
+
 /* ✅ Responsive Container */
 .attendance-container {
   display: flex;
@@ -295,7 +299,7 @@ body {
 
 </head>
 <body lang="en-US" dir="ltr">
-  <div class="container-wrapper">
+  <div class="container-wrapper view-uppercase">
   <div class="attendance-container">
   <table class="attendance-table">
     <tr>

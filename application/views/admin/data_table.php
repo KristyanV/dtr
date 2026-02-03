@@ -258,7 +258,7 @@ table#attendanceTable tbody tr {
     </span>
   <?php endif; ?>
 </td>
-
+    
 
 <td>
     <div style="display: flex; gap: 8px; justify-content: center;">
@@ -270,7 +270,7 @@ table#attendanceTable tbody tr {
         </a>
         
         <!-- Update Button -->
-        <a href="<?= base_url('Public_page/data_update/' . $row['id']) ?>" 
+        <a href="<?= base_url('Public_page/data_update/' . $row['id']) ?>"  
            class="btn btn-warning btn-sm update-button" 
            data-report-id="<?= $row['id'] ?>">
             UPDATE

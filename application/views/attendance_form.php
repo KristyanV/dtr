@@ -354,7 +354,7 @@ margin-top: 30px;
         <thead>
           <tr>
             <th>Name of Absentees</th>
-            <th>Informed/Not Informed</th>
+            <th>inform/Not Informed</th>
             <th>Cause of Absence</th>
             <th>Action</th>
           </tr>

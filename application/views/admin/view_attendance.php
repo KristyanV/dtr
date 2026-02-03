@@ -39,6 +39,10 @@ body {
   page-break-inside: avoid;
 }
 
+.view-uppercase {
+  text-transform: uppercase;
+}
+
 /* ✅ Responsive Container */
 .attendance-container {
   display: flex;
@@ -361,7 +365,7 @@ body {
 </head>
 <body lang="en-US" dir="ltr">
  <form action="<?= base_url('Public_page/view_data/'.($report['id'] ?? ''))?>" method="POST">
-  <div class="container-wrapper">
+  <div class="container-wrapper view-uppercase">
   <div class="attendance-container">
   <table class="attendance-table">
     <tr>
