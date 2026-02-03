@@ -151,4 +151,10 @@ public function mark_as_noted($report_id, $noted_by_name, $noted_by_role) {
     ]);
 }
 
+// Reset user password
+public function reset_user_password($user_id, $new_password) {
+    $this->db->where('id', $user_id);
+    return $this->db->update('users', ['password' => $new_password]);
+}
+
 }

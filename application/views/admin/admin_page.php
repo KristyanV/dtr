@@ -102,6 +102,11 @@
                               data-current-role="<?= htmlspecialchars($user['role'] ?? 'viewer') ?>">
                         EDIT ROLE
                       </button>
+                      <button class="btn btn-sm btn-danger reset-password-btn" 
+                              data-user-id="<?= $user['id'] ?>" 
+                              data-username="<?= htmlspecialchars($user['username']) ?>">
+                        RESET PASSWORD
+                      </button>
                     </td>
                   </tr>
                 <?php endforeach; ?>
@@ -134,8 +139,10 @@
             // Show all users if search is empty
             $('#userTableBody').empty();
             allUsers.forEach(row => {
-              $('#userTableBody').append(row.clone());
-              attachEditRoleListener(row.clone());
+              const clonedRow = row.clone();
+              $('#userTableBody').append(clonedRow);
+              attachEditRoleListener(clonedRow);
+              attachResetPasswordListener(clonedRow);
             });
           } else {
             // Filter users based on search term
@@ -147,8 +154,10 @@
             $('#userTableBody').empty();
             if (filteredRows.length > 0) {
               filteredRows.forEach(row => {
-                $('#userTableBody').append(row.clone());
-                attachEditRoleListener(row.clone());
+                const clonedRow = row.clone();
+                $('#userTableBody').append(clonedRow);
+                attachEditRoleListener(clonedRow);
+                attachResetPasswordListener(clonedRow);
               });
             } else {
               $('#userTableBody').html('<tr><td colspan="7" class="text-center text-muted">No users found</td></tr>');
@@ -163,9 +172,20 @@
           });
         }
 
+        // Attach reset password listener to dynamically added buttons
+        function attachResetPasswordListener(rowElement) {
+          $(rowElement).find('.reset-password-btn').on('click', function() {
+            handleResetPassword($(this));
+          });
+        }
+
         // Initial attachment
         $('.edit-role-btn').on('click', function() {
           handleEditRole($(this));
+        });
+
+        $('.reset-password-btn').on('click', function() {
+          handleResetPassword($(this));
         });
 
         // Handle edit role modal
@@ -211,6 +231,70 @@
                 },
                 error: function() {
                   Swal.fire('Error!', 'Failed to update role', 'error');
+                }
+              });
+            }
+          });
+        }
+
+        // Handle reset password
+        function handleResetPassword(button) {
+          const userId = button.data('user-id');
+          const username = button.data('username');
+
+          Swal.fire({
+            title: 'Reset Password',
+            html: `
+              <p class="mb-3">Reset password for user: <strong>${username}</strong></p>
+              <input type="password" id="new-password" class="form-control mb-2" placeholder="New password (min 6 characters)">
+              <input type="password" id="confirm-password" class="form-control" placeholder="Confirm password">
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Reset Password',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#dc3545',
+            preConfirm: () => {
+              const newPassword = $('#new-password').val();
+              const confirmPassword = $('#confirm-password').val();
+
+              if (!newPassword || !confirmPassword) {
+                Swal.showValidationMessage('Please fill in both fields');
+                return false;
+              }
+
+              if (newPassword !== confirmPassword) {
+                Swal.showValidationMessage('Passwords do not match');
+                return false;
+              }
+
+              if (newPassword.length < 6) {
+                Swal.showValidationMessage('Password must be at least 6 characters');
+                return false;
+              }
+
+              return newPassword;
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const newPassword = result.value;
+
+              $.ajax({
+                url: '<?= base_url('Main/reset_user_password') ?>',
+                type: 'POST',
+                data: {
+                  user_id: userId,
+                  new_password: newPassword
+                },
+                success: function(response) {
+                  const res = JSON.parse(response);
+                  if (res.success) {
+                    Swal.fire('Success!', res.message, 'success');
+                  } else {
+                    Swal.fire('Error!', res.message, 'error');
+                  }
+                },
+                error: function() {
+                  Swal.fire('Error!', 'Failed to reset password', 'error');
                 }
               });
             }

@@ -158,10 +158,23 @@ table#attendanceTable tbody tr {
   <body>
     <div class="wrapper">
       <nav class="sidebar bg-light">
+        <div class="text-center mb-4">
+          <img src="<?= base_url('assets/image/prc_logo.png') ?>" alt="PRC Logo" style="max-width: 120px; height: auto;">
+        </div>
+        
         <div class="user-info mb-4">
           <div class="fw-bold">HELLO,</div>
           <div class="fw-bold"><?= htmlspecialchars($this->session->userdata('full_name') ?? $this->session->userdata('username') ?? 'User') ?></div>
         </div>
+        
+        <?php if (isset($is_admin) && $is_admin == 1): ?>
+        <div class="mb-4">
+          <a href="<?= base_url('Main/admin') ?>" class="btn btn-primary w-90">
+            <i class="bi bi-arrow-left-circle"></i> ADMIN DASHBOARD
+          </a>
+        </div>
+        <?php endif; ?>
+        
         <div class="mb-4">
           <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success w-90">CREATE A REPORT</a>
         </div>

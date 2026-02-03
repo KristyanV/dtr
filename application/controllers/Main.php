@@ -174,6 +174,39 @@ public function update_user_role()
     }
 }
 
+// Reset user password
+public function reset_user_password()
+{
+    if (!$this->session->userdata('is_admin')) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        return;
+    }
+
+    $user_id = $this->input->post('user_id');
+    $new_password = $this->input->post('new_password');
+
+    // Validate inputs
+    if (empty($user_id) || empty($new_password)) {
+        echo json_encode(['success' => false, 'message' => 'Invalid input']);
+        return;
+    }
+
+    // Validate password length
+    if (strlen($new_password) < 6) {
+        echo json_encode(['success' => false, 'message' => 'Password must be at least 6 characters']);
+        return;
+    }
+
+    // Reset the password
+    $result = $this->Attendance_model->reset_user_password($user_id, $new_password);
+    
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Password reset successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to reset password']);
+    }
+}
+
 
 
 public function mark_viewed($report_id)
