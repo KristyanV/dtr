@@ -319,7 +319,12 @@ th {
   <div class="report-container">
    <div class="report-header">
     <span class="content_head">DIVISION/SECTION/UNIT:</span>
-    <input type="text" id="division" name="division" value="<?= htmlspecialchars($attendance_reports['division'] ?? '') ?>">
+    <select id="division" name="division">
+      <option value="">-- Select Division --</option>
+      <option value="FAD" <?= ($attendance_reports['division'] ?? '') === 'FAD' ? 'selected' : '' ?>>FAD</option>
+      <option value="DUMMY1" <?= ($attendance_reports['division'] ?? '') === 'DUMMY1' ? 'selected' : '' ?>>DUMMY1</option>
+      <option value="DUMMY2" <?= ($attendance_reports['division'] ?? '') === 'DUMMY2' ? 'selected' : '' ?>>DUMMY2</option>
+    </select>
         <label for="report_date">Date:</label>
     <input type="date" id="report_date" name="report_date" value="<?= htmlspecialchars($attendance_reports['report_date'] ?? '') ?>">
 </div>
@@ -352,14 +357,18 @@ th {
         </thead>
         <tbody>
           <tr>
-            <td><input type="text" name="absentees[name][]" placeholder="Name"></td>
-                       <td>
-  <select name="absentees[informed][]" required>
-    <option value="">-- Select --</option>
-    <option value="Informed">Informed</option>
-    <option value="Not Informed">Not Informed</option>
-  </select>
-</td>
+            <td>
+              <select name="absentees[name][]" class="employee-name">
+                <option value="">-- Select Employee --</option>
+              </select>
+            </td>
+            <td>
+              <select name="absentees[informed][]" required>
+                <option value="">-- Select --</option>
+                <option value="Informed">Informed</option>
+                <option value="Not Informed">Not Informed</option>
+              </select>
+            </td>
             <td><input type="text" name="absentees[cause][]" placeholder="Cause"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
           </tr>
@@ -381,7 +390,11 @@ th {
         </thead>
         <tbody>
           <tr>
-            <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
+            <td>
+              <select name="not_in_uniform[name][]" class="employee-name">
+                <option value="">-- Select Employee --</option>
+              </select>
+            </td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
           </tr>
@@ -444,14 +457,18 @@ function addAbsenteeRow() {
     const table = document.querySelector('#attendanceTable tbody');
     const newRow = `
         <tr>
-            <td><input type="text" name="absentees[name][]" placeholder="Name"></td>
-                        <td>
-  <select name="absentees[informed][]" required>
-    <option value="">-- Select --</option>
-    <option value="Informed">Informed</option>
-    <option value="Not Informed">Not Informed</option>
-  </select>
-</td>
+            <td>
+              <select name="absentees[name][]" class="employee-name" ${employeeSelectDisabled ? 'disabled' : ''}>
+                ${employeeOptionsHtml}
+              </select>
+            </td>
+            <td>
+              <select name="absentees[informed][]" required>
+                <option value="">-- Select --</option>
+                <option value="Informed">Informed</option>
+                <option value="Not Informed">Not Informed</option>
+              </select>
+            </td>
             <td><input type="text" name="absentees[cause][]" placeholder="Cause"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
         </tr>
@@ -463,7 +480,11 @@ function addUniformRow() {
     const table = document.querySelector('#uniformTable tbody');
     const newRow = `
         <tr>
-            <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
+            <td>
+              <select name="not_in_uniform[name][]" class="employee-name" ${employeeSelectDisabled ? 'disabled' : ''}>
+                ${employeeOptionsHtml}
+              </select>
+            </td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
         </tr>
@@ -476,9 +497,68 @@ function removeRow(button) {
     row.remove();
 }
 
+let employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+let employeeSelectDisabled = true;
+
+function updateEmployeeOptions(optionsHtml, isDisabled) {
+  const selects = document.querySelectorAll('.employee-name');
+  selects.forEach((select) => {
+    const currentValue = select.value;
+    select.innerHTML = optionsHtml;
+    select.disabled = isDisabled;
+    // Try to restore previous value if it exists in new options
+    if (currentValue && select.querySelector(`option[value="${currentValue}"]`)) {
+      select.value = currentValue;
+    }
+  });
+}
+
+function fetchEmployeesByDivision(division) {
+  if (!division) {
+    employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+    employeeSelectDisabled = true;
+    updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    return;
+  }
+
+  $.getJSON('<?= base_url('Public_page/get_employees_by_division'); ?>', { division: division })
+    .done(function (data) {
+      const options = ['<option value="">-- Select Employee --</option>'];
+      if (Array.isArray(data)) {
+        data.forEach(function (employee) {
+          if (employee && employee.name) {
+            const safeName = String(employee.name).replace(/"/g, '&quot;');
+            options.push(`<option value="${safeName}">${safeName}</option>`);
+          }
+        });
+      }
+
+      employeeOptionsHtml = options.join('');
+      employeeSelectDisabled = false;
+      updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    })
+    .fail(function () {
+      employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+      employeeSelectDisabled = true;
+      updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    });
+}
+
 
     // ✅ Submit handler with validation
     $(document).ready(function () {
+        // Fetch employees on page load if division is already selected
+        const initialDivision = $('#division').val();
+        if (initialDivision) {
+            fetchEmployeesByDivision(initialDivision);
+        }
+
+        // Listen for division change
+        $('#division').on('change', function() {
+            const division = $(this).val();
+            fetchEmployeesByDivision(division);
+        });
+
         // 𝗣𝗥𝗘-𝗙𝗜𝗟𝗟 𝗗𝗔𝗧𝗔 𝗛𝗘𝗥𝗘 (ADD THIS SECTION)
         <?php if (!empty($attendance_reports['absentees'])): ?>
             <?php $absentees = json_decode($attendance_reports['absentees'], true); ?>
@@ -486,10 +566,15 @@ function removeRow(button) {
                 <?php if ($index > 0): ?>
                     addAbsenteeRow();
                 <?php endif; ?>
-                document.querySelectorAll('[name="absentees[name][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['name']) ?>';
-                document.querySelectorAll('[name="absentees[informed][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['informed']) ?>';
-                document.querySelectorAll('[name="absentees[cause][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['cause']) ?>';
             <?php endforeach; ?>
+            // Wait for employees to load before setting values
+            setTimeout(function() {
+                <?php foreach ($absentees as $index => $absentee): ?>
+                    document.querySelectorAll('[name="absentees[name][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['name']) ?>';
+                    document.querySelectorAll('[name="absentees[informed][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['informed']) ?>';
+                    document.querySelectorAll('[name="absentees[cause][]"]')[<?= $index ?>].value = '<?= addslashes($absentee['cause']) ?>';
+                <?php endforeach; ?>
+            }, 500);
         <?php endif; ?>
 
         <?php if (!empty($attendance_reports['not_in_uniform'])): ?>
@@ -498,9 +583,14 @@ function removeRow(button) {
                 <?php if ($index > 0): ?>
                     addUniformRow();
                 <?php endif; ?>
-                document.querySelectorAll('[name="not_in_uniform[name][]"]')[<?= $index ?>].value = '<?= addslashes($uniform['name']) ?>';
-                document.querySelectorAll('[name="not_in_uniform[remarks][]"]')[<?= $index ?>].value = '<?= addslashes($uniform['remarks']) ?>';
             <?php endforeach; ?>
+            // Wait for employees to load before setting values
+            setTimeout(function() {
+                <?php foreach ($uniforms as $index => $uniform): ?>
+                    document.querySelectorAll('[name="not_in_uniform[name][]"]')[<?= $index ?>].value = '<?= addslashes($uniform['name']) ?>';
+                    document.querySelectorAll('[name="not_in_uniform[remarks][]"]')[<?= $index ?>].value = '<?= addslashes($uniform['remarks']) ?>';
+                <?php endforeach; ?>
+            }, 500);
         <?php endif; ?>
 
         // Existing submit handler

@@ -332,8 +332,8 @@ margin-top: 30px;
       <select id="division" name="division">
         <option value=""></option>
         <option value="FAD">FAD</option>
-        <option value="DUMMY 1">DUMMY 1</option>
-        <option value="DUMMY 2">DUMMY 2</option>
+        <option value="DUMMY1">DUMMY1</option>
+        <option value="DUMMY2">DUMMY2</option>
       </select>
       <label for="report_date">Date:</label>
       <input type="date" id="report_date" name="report_date">
