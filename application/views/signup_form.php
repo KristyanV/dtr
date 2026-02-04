@@ -82,7 +82,12 @@
             <input type="text" name="companyposition" class="form-control" placeholder="Company / Position">
           </div>
           <div class="col-md-6">
-            <input type="text" name="department" class="form-control" placeholder="Division/Section">
+            <select name="department" class="form-control" required>
+              <option value="">Select Division/Section</option>
+              <option value="FAD">FAD</option>
+              <option value="DUMMY1">DUMMY1</option>
+              <option value="DUMMY2">DUMMY2</option>
+            </select>
           </div>
 
           <div class="col-12">

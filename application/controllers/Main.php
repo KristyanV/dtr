@@ -114,6 +114,7 @@ class Main extends CI_Controller {
             'dateofbirth' => $this->input->post('dateofbirth'),
             'gender' => $this->input->post('gender'),
             'companyposition' => $this->input->post('companyposition'),
+            'department' => $this->input->post('department'),
             'created_at' => date('Y-m-d H:i:s')
         ];
 
@@ -207,6 +208,60 @@ public function reset_user_password()
     }
 }
 
+// Add employee
+public function add_employee()
+{
+    if (!$this->session->userdata('is_admin')) {
+        echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+        return;
+    }
+
+    $email = $this->input->post('email');
+    $username = $this->input->post('username');
+    $password = $this->input->post('password');
+    $name = $this->input->post('name');
+    $middlename = $this->input->post('middlename');
+    $surname = $this->input->post('surname');
+    $dateofbirth = $this->input->post('dateofbirth');
+    $gender = $this->input->post('gender');
+    $companyposition = $this->input->post('companyposition');
+    $department = $this->input->post('department');
+
+    // Validate required fields
+    if (empty($email) || empty($username) || empty($password) || empty($name) || empty($surname) || empty($dateofbirth) || empty($gender) || empty($department)) {
+        echo json_encode(['success' => false, 'message' => 'Missing required fields']);
+        return;
+    }
+
+    // Check duplicate username or email
+    if ($this->Attendance_model->get_user_by_username_or_email($username, $email)) {
+        echo json_encode(['success' => false, 'message' => 'Username or email already exists']);
+        return;
+    }
+
+    $data = [
+        'email' => $email,
+        'username' => $username,
+        'password' => $password,
+        'name' => $name,
+        'middlename' => $middlename,
+        'surname' => $surname,
+        'dateofbirth' => $dateofbirth,
+        'gender' => $gender,
+        'companyposition' => $companyposition,
+        'department' => $department,
+        'role' => 'viewer',
+        'created_at' => date('Y-m-d H:i:s')
+    ];
+
+    $result = $this->Attendance_model->create_user($data);
+
+    if ($result) {
+        echo json_encode(['success' => true, 'message' => 'Employee added successfully']);
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Failed to add employee']);
+    }
+}
 
 
 public function mark_viewed($report_id)

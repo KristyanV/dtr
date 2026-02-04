@@ -9,6 +9,7 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <style>
       body {
@@ -45,6 +46,19 @@
       .table thead th {
         color: #000000 !important;
       }
+      /* Signup Form Styles */
+      .signup-box{width:520px;background:#fff;padding:28px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.08)}
+      .signup-box h2{text-align:center;margin-bottom:20px}
+      .form-control{height:48px}
+      .submit-btn{height:48px}
+      .small-note{font-size:14px;color:black;margin-top:10px;text-align:center}
+      .password-container {position:relative;display:flex;align-items:center;width:100%}
+      .password-container input {width:100%;height:48px;padding:0 50px 0 12px;border-radius:4px;border:1px solid #ced4da;outline:none}
+      .password-container input:focus {border-color:#80bdff;box-shadow:0 0 0 0.2rem rgba(0,123,255,0.25)}
+      .field-icon {position:absolute;right:15px;top:50%;transform:translateY(-50%);cursor:pointer;color:#222;font-size:16px;z-index:2}
+      .password-match-icon {position:absolute;right:45px;top:50%;transform:translateY(-50%);font-size:16px;z-index:1;display:none}
+      .password-match-icon.error {color:#dc3545;display:block}
+      .password-match-icon.success {color:#28a745;display:block}
     </style>
   </head>
   <body>
@@ -61,7 +75,7 @@
       </div>
 
       <div class="row g-3 mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="card p-3">
             <h5 class="mb-2">Attendance Reports</h5>
             <p class="text-muted mb-3">View submitted reports and manage updates.</p>
@@ -69,11 +83,19 @@
           </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
           <div class="card p-3">
             <h5 class="mb-2">Create a Report</h5>
             <p class="text-muted mb-3">Open the attendance form to submit a report.</p>
             <a href="<?= base_url('Public_page/attendance_form') ?>" class="btn btn-success">Create Report</a>
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <div class="card p-3">
+            <h5 class="mb-2">Add Employee</h5>
+            <p class="text-muted mb-3">Register a new employee account.</p>
+            <button class="btn" id="addEmployeeBtn" style="background-color: #1400FF; color: white; border: none;">Add Employee</button>
           </div>
         </div>
       </div>
@@ -148,6 +170,183 @@
         $('#userTableBody tr').each(function() {
           allUsers.push($(this));
         });
+
+        // Add Employee Button Handler
+        $('#addEmployeeBtn').on('click', function() {
+          handleAddEmployee();
+        });
+
+        // Handle add employee modal
+        function handleAddEmployee() {
+          Swal.fire({
+            title: 'Add New Employee',
+            html: `
+              <div style="max-width: 520px; margin: 0 auto;">
+                <form id="addEmployeeForm">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <input type="email" id="emp-email" class="form-control" placeholder="Email" required>
+                    </div>
+                    <div class="col-md-6">
+                      <input type="text" id="emp-username" class="form-control" placeholder="Username" required>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="password-container">
+                        <input type="password" id="emp-password" placeholder="Password (min 6 chars)" required minlength="6">
+                        <span toggle="#emp-password" class="fa fa-fw fa-eye field-icon toggle-password-emp"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-12">
+                      <div class="password-container">
+                        <input type="password" id="emp-confirm-password" placeholder="Confirm Password" required minlength="6">
+                        <span class="fa fa-times-circle password-match-icon" id="emp-matchIcon"></span>
+                        <span toggle="#emp-confirm-password" class="fa fa-fw fa-eye field-icon toggle-password-emp"></span>
+                      </div>
+                    </div>
+
+                    <div class="col-md-4">
+                      <input type="text" id="emp-name" class="form-control" placeholder="First name" required>
+                    </div>
+                    <div class="col-md-4">
+                      <input type="text" id="emp-middlename" class="form-control" placeholder="Middle name">
+                    </div>
+                    <div class="col-md-4">
+                      <input type="text" id="emp-surname" class="form-control" placeholder="Surname" required>
+                    </div>
+
+                    <div class="col-md-6">
+                      <input type="date" id="emp-dateofbirth" class="form-control" placeholder="Date of birth" required>
+                    </div>
+                    <div class="col-md-6">
+                      <select id="emp-gender" class="form-control" required>
+                        <option value="">Select gender</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+
+                    <div class="col-md-6">
+                      <input type="text" id="emp-position" class="form-control" placeholder="Company / Position">
+                    </div>
+                    <div class="col-md-6">
+                      <select id="emp-department" class="form-control" required>
+                        <option value="">Select Division/Section</option>
+                        <option value="FAD">FAD</option>
+                        <option value="DUMMY1">DUMMY1</option>
+                        <option value="DUMMY2">DUMMY2</option>
+                      </select>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Add Employee',
+            cancelButtonText: 'Cancel',
+            confirmButtonColor: '#212529',
+            didOpen: function(modal) {
+              // Add event listeners for password visibility toggle
+              $('.toggle-password-emp').on('click', function() {
+                $(this).toggleClass("fa-eye fa-eye-slash");
+                var input = $($(this).attr("toggle"));
+                if (input.attr("type") == "password") {
+                  input.attr("type", "text");
+                } else {
+                  input.attr("type", "password");
+                }
+              });
+
+              // Real-time password match validation
+              $("#emp-confirm-password, #emp-password").on("keyup", function() {
+                var password = $("#emp-password").val();
+                var confirmPassword = $("#emp-confirm-password").val();
+                var matchIcon = $("#emp-matchIcon");
+                
+                if (confirmPassword.length > 0) {
+                  if (password !== confirmPassword) {
+                    matchIcon.removeClass("fa-check-circle success").addClass("fa-times-circle error");
+                  } else {
+                    matchIcon.removeClass("fa-times-circle error").addClass("fa-check-circle success");
+                  }
+                } else {
+                  matchIcon.removeClass("error success");
+                }
+              });
+            },
+            preConfirm: () => {
+              const email = $('#emp-email').val().trim();
+              const username = $('#emp-username').val().trim();
+              const name = $('#emp-name').val().trim();
+              const middlename = $('#emp-middlename').val().trim();
+              const surname = $('#emp-surname').val().trim();
+              const dateofbirth = $('#emp-dateofbirth').val().trim();
+              const gender = $('#emp-gender').val();
+              const position = $('#emp-position').val().trim();
+              const department = $('#emp-department').val();
+              const password = $('#emp-password').val();
+              const confirmPassword = $('#emp-confirm-password').val();
+
+              if (!email || !username || !name || !surname || !dateofbirth || !gender || !department || !password || !confirmPassword) {
+                Swal.showValidationMessage('Please fill in all required fields');
+                return false;
+              }
+
+              if (!email.includes('@')) {
+                Swal.showValidationMessage('Please enter a valid email');
+                return false;
+              }
+
+              if (password !== confirmPassword) {
+                Swal.showValidationMessage('Passwords do not match');
+                return false;
+              }
+
+              if (password.length < 6) {
+                Swal.showValidationMessage('Password must be at least 6 characters');
+                return false;
+              }
+
+              return {
+                email: email,
+                username: username,
+                name: name,
+                middlename: middlename,
+                surname: surname,
+                dateofbirth: dateofbirth,
+                gender: gender,
+                companyposition: position,
+                department: department,
+                password: password
+              };
+            }
+          }).then((result) => {
+            if (result.isConfirmed) {
+              const formData = result.value;
+
+              $.ajax({
+                url: '<?= base_url('Main/add_employee') ?>',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                  const res = JSON.parse(response);
+                  if (res.success) {
+                    Swal.fire('Success!', res.message, 'success').then(() => {
+                      location.reload();
+                    });
+                  } else {
+                    Swal.fire('Error!', res.message, 'error');
+                  }
+                },
+                error: function() {
+                  Swal.fire('Error!', 'Failed to add employee', 'error');
+                }
+              });
+            }
+          });
+        }
 
         // Search functionality
         $('#searchName').on('keyup', function() {

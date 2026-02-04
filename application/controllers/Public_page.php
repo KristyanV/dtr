@@ -20,6 +20,33 @@ class Public_page extends CI_Controller {
         $this->load->view('attendance_form');
     }
 
+    // Return employees for a given division/department
+    public function get_employees_by_division() {
+        $division = $this->input->get('division');
+
+        if (empty($division)) {
+            return $this->output
+                ->set_content_type('application/json')
+                ->set_output(json_encode([]));
+        }
+
+        $users = $this->Attendance_model->get_users_by_department($division);
+        $employees = [];
+
+        foreach ($users as $user) {
+            $middle_initial = !empty($user['middlename']) ? strtoupper(substr($user['middlename'], 0, 1)) . '.' : '';
+            $full_name = trim($user['name'] . ' ' . $middle_initial . ' ' . $user['surname']);
+            $employees[] = [
+                'id' => $user['id'],
+                'name' => $full_name
+            ];
+        }
+
+        return $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($employees));
+    }
+
     public function submit() {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') {
             $this->load->view('attendance_form');

@@ -133,6 +133,13 @@ public function get_all_users() {
     return $this->db->get('users')->result_array();
 }
 
+// Get users by department/division
+public function get_users_by_department($department) {
+    $this->db->where('department', $department);
+    $this->db->order_by('surname', 'ASC');
+    return $this->db->get('users')->result_array();
+}
+
 // Update user role
 public function update_user_role($user_id, $role) {
     $this->db->where('id', $user_id);

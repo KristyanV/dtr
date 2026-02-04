@@ -329,7 +329,12 @@ margin-top: 30px;
   <div class="report-container">
     <div class="report-header">
       <span class="content_head">DIVISION/SECTION/UNIT:</span>
-      <input type="text" id="division" name="division">
+      <select id="division" name="division">
+        <option value=""></option>
+        <option value="FAD">FAD</option>
+        <option value="DUMMY 1">DUMMY 1</option>
+        <option value="DUMMY 2">DUMMY 2</option>
+      </select>
       <label for="report_date">Date:</label>
       <input type="date" id="report_date" name="report_date">
     </div>
@@ -361,7 +366,11 @@ margin-top: 30px;
         </thead>
         <tbody>
           <tr>
-            <td><input type="text" name="absentees[name][]" placeholder="Name"></td>
+            <td>
+              <select name="absentees[name][]" class="employee-name">
+                <option value="">-- Select Employee --</option>
+              </select>
+            </td>
             <td>
   <select name="absentees[informed][]" required>
     <option value="">-- Select --</option>
@@ -390,7 +399,11 @@ margin-top: 30px;
         </thead>
         <tbody>
           <tr>
-            <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
+            <td>
+              <select name="not_in_uniform[name][]" class="employee-name">
+                <option value="">-- Select Employee --</option>
+              </select>
+            </td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
           </tr>
@@ -454,7 +467,11 @@ function addAbsenteeRow() {
     const table = document.querySelector('#attendanceTable tbody');
     const newRow = `
         <tr>
-            <td><input type="text" name="absentees[name][]" placeholder="Name"></td>
+            <td>
+              <select name="absentees[name][]" class="employee-name" ${employeeSelectDisabled ? 'disabled' : ''}>
+                ${employeeOptionsHtml}
+              </select>
+            </td>
                        <td>
   <select name="absentees[informed][]" required>
     <option value="">-- Select --</option>
@@ -473,7 +490,11 @@ function addUniformRow() {
     const table = document.querySelector('#uniformTable tbody');
     const newRow = `
         <tr>
-            <td><input type="text" name="not_in_uniform[name][]" placeholder="Name"></td>
+            <td>
+              <select name="not_in_uniform[name][]" class="employee-name" ${employeeSelectDisabled ? 'disabled' : ''}>
+                ${employeeOptionsHtml}
+              </select>
+            </td>
             <td><input type="text" name="not_in_uniform[remarks][]" placeholder="Remarks"></td>
             <td><button type="button" onclick="removeRow(this)" class="btn btn-danger">DELETE</button></td>
         </tr>
@@ -486,8 +507,58 @@ function removeRow(button) {
     row.remove();
 }
 
+let employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+let employeeSelectDisabled = true;
+
+function updateEmployeeOptions(optionsHtml, isDisabled) {
+  const selects = document.querySelectorAll('.employee-name');
+  selects.forEach((select) => {
+    select.innerHTML = optionsHtml;
+    select.disabled = isDisabled;
+  });
+}
+
+function fetchEmployeesByDivision(division) {
+  if (!division) {
+    employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+    employeeSelectDisabled = true;
+    updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    return;
+  }
+
+  $.getJSON('<?= base_url('Public_page/get_employees_by_division'); ?>', { division: division })
+    .done(function (data) {
+      const options = ['<option value="">-- Select Employee --</option>'];
+      if (Array.isArray(data)) {
+        data.forEach(function (employee) {
+          if (employee && employee.name) {
+            const safeName = String(employee.name).replace(/"/g, '&quot;');
+            options.push(`<option value="${safeName}">${safeName}</option>`);
+          }
+        });
+      }
+
+      employeeOptionsHtml = options.join('');
+      employeeSelectDisabled = false;
+      updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    })
+    .fail(function () {
+      employeeOptionsHtml = '<option value="">-- Select Employee --</option>';
+      employeeSelectDisabled = true;
+      updateEmployeeOptions(employeeOptionsHtml, employeeSelectDisabled);
+    });
+}
+
     // ✅ Submit handler with validation
     $(document).ready(function () {
+      $('#division').on('change', function () {
+        fetchEmployeesByDivision($(this).val().trim());
+      });
+
+      if ($('#division').val()) {
+        fetchEmployeesByDivision($('#division').val().trim());
+      }
+
         $('#report_attendance').submit(function (e) {
             // e.preventDefault(); // ❌ Remove this unless you're handling form manually via AJAX
 
